@@ -162,18 +162,27 @@ sup { font-size: 0.68em; line-height: 0; }
 .scope { margin: 0; }
 .scope svg { width: 100%; height: auto; display: block; overflow: visible; }
 .scope .axis { stroke: rgba(188, 210, 255, 0.28); stroke-width: 1; }
+.scope .plot { position: relative; }
 .scope .trace {
   fill: none; stroke: var(--trace); stroke-width: 1.8;
   stroke-linejoin: round; stroke-linecap: round;
-  stroke-dasharray: 1; stroke-dashoffset: 1;
-  animation: draw 2.8s cubic-bezier(0.3, 0.1, 0.2, 1) 0.2s forwards;
+}
+/* The trace sits in its own SVG layer and is revealed left to right by clipping
+   that layer's box. No stroke-dash animation since it breaks on iOS Safari */
+.scope .sweep {
+  position: absolute; inset: 0;
+  -webkit-clip-path: inset(-8px 100% -8px -8px);
+  clip-path: inset(-8px 100% -8px -8px);
+  animation: sweep 2.8s cubic-bezier(0.3, 0.1, 0.2, 1) 0.2s forwards;
 }
 .scope figcaption {
   display: flex; justify-content: space-between; margin-top: 0.6rem;
   font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em;
   text-transform: uppercase; color: rgba(188, 210, 255, 0.75);
 }
-@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes sweep {
+  to { -webkit-clip-path: inset(-8px); clip-path: inset(-8px); }
+}
 
 .fields { background: var(--navy); color: #fff; }
 .fields ul {
@@ -405,7 +414,7 @@ a.plate:hover { border-color: var(--navy); }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .scope .trace { animation: none; stroke-dashoffset: 0; }
+  .scope .sweep { animation: none; -webkit-clip-path: none; clip-path: none; }
 }
 
 @media print {
